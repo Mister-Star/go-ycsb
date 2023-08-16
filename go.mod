@@ -15,9 +15,9 @@ require (
 	github.com/elastic/go-elasticsearch/v8 v8.3.0
 	github.com/envoyproxy/go-control-plane v0.10.3 // indirect
 	github.com/envoyproxy/protoc-gen-validate v0.9.1 // indirect
-	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51 // indirect
+	github.com/facebookgo/ensure v0.0.0-20200202191622-63f1cf65ac4c // indirect
 	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
-	github.com/facebookgo/subset v0.0.0-20150612182917-8dac2c3c4870 // indirect
+	github.com/facebookgo/subset v0.0.0-20200203212716-c811ad88dec4 // indirect
 	github.com/fortytw2/leaktest v1.3.0 // indirect
 	github.com/go-ini/ini v1.49.0 // indirect
 	github.com/go-redis/redis/v9 v9.0.0-rc.1
@@ -51,7 +51,7 @@ require (
 	github.com/pebbe/zmq4 v1.2.10
 	go.etcd.io/etcd/client/pkg/v3 v3.5.2
 	go.etcd.io/etcd/client/v3 v3.5.2
-	google.golang.org/grpc v1.48.0
+	google.golang.org/grpc v1.53.0
 	google.golang.org/protobuf v1.31.0
 
 )
@@ -90,10 +90,6 @@ require (
 	github.com/dgryski/go-farm v0.0.0-20190423205320-6a90982ecee2 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/elastic/elastic-transport-go/v8 v8.0.0-20211216131617-bbee439d559c // indirect
-	github.com/facebookgo/ensure v0.0.0-20200202191622-63f1cf65ac4c // indirect
-	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
-	github.com/facebookgo/subset v0.0.0-20200203212716-c811ad88dec4 // indirect
-	github.com/fortytw2/leaktest v1.3.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/snappy v0.0.4 // indirect
@@ -134,8 +130,8 @@ require (
 	github.com/youmark/pkcs8 v0.0.0-20181117223130-1be2e3e5546d // indirect
 	github.com/yuin/gopher-lua v0.0.0-20181031023651-12c4817b42c5 // indirect
 	go.etcd.io/etcd/api/v3 v3.5.2 // indirect
-	go.starlark.net v0.0.0-20230718153141-1c3ac63bd217
 	go.opencensus.io v0.24.0 // indirect
+	go.starlark.net v0.0.0-20230718153141-1c3ac63bd217
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
 	go.uber.org/zap v1.20.0 // indirect
@@ -147,8 +143,6 @@ require (
 	golang.org/x/text v0.7.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/grpc v1.53.0 // indirect
-	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
@@ -160,14 +154,13 @@ replace github.com/apache/thrift => github.com/apache/thrift v0.16.0
 //require github.com/Mister-Star/go-ycsb/taas_tikv v0.1.0
 
 replace (
-github.com/pingcap/go-ycsb/db/taas_hbase => ./taas_hbase
-github.com/pingcap/go-ycsb/db/taas_proto => ./taas_proto
-github.com/pingcap/go-ycsb/db/taas_hbase_txn => ./taas_hbase_txn
-github.com/pingcap/go-ycsb/db/taas_tikv => ./taas_tikv
-github.com/pingcap/go-ycsb/db/taas_tikv_txn => ./taas_tikv_txn
-github.com/pingcap/go-ycsb/db/tikv => ./tikv
-github.com/pingcap/go-ycsb/db/tikv_txn => ./tikv_txn
+	github.com/pingcap/go-ycsb/db/taas_hbase => ./taas_hbase
+	github.com/pingcap/go-ycsb/db/taas_hbase_txn => ./taas_hbase_txn
+	github.com/pingcap/go-ycsb/db/taas_proto => ./taas_proto
+	github.com/pingcap/go-ycsb/db/taas_tikv => ./taas_tikv
+	github.com/pingcap/go-ycsb/db/taas_tikv_txn => ./taas_tikv_txn
+	github.com/pingcap/go-ycsb/db/tikv => ./tikv
+	github.com/pingcap/go-ycsb/db/tikv_txn => ./tikv_txn
 )
-
 
 go 1.18

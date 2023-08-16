@@ -3,6 +3,7 @@ package taas_leveldb
 import (
 	"context"
 	"fmt"
+	"github.com/pingcap/go-ycsb/db/taas"
 	"sync/atomic"
 
 	"github.com/icexin/brpc-go"
@@ -29,7 +30,7 @@ var LeveldbConnection []*leveldb.DB
 var ClientConnectionNum int = 256
 
 func createTxnDB(p *properties.Properties) (ycsb.DB, error) {
-	TaasServerIp = p.GetString("taasServerIp", "")
+	taas.TaasServerIp = p.GetString("taasServerIp", "")
 	// leveldb找到本地leveldb数据库文件夹进行连接，不用管
 	dir := p.GetString("leveldb.dir", "/tmp/leveldb_simple_example")
 	db, _ := leveldb.OpenFile(dir, nil)
@@ -141,8 +142,8 @@ func (db *txnDB) Update(ctx context.Context, table string, key string, values ma
 // unfinished batchUpdate, no need for scan there's no proto for this action
 func (db *txnDB) BatchUpdate(ctx context.Context, table string, keys []string, values []map[string][]byte) error {
 	fmt.Println("unsure BatchUpdate()")
-	txnId := atomic.AddUint64(&atomicCounter, 1) // return new value
-	atomic.AddUint64(&TotalTransactionCounter, 1)
+	txnId := atomic.AddUint64(&taas.CSNCounter, 1) // return new value
+	atomic.AddUint64(&taas.TotalTransactionCounter, 1)
 
 	batch := new(leveldb.Batch)
 	buf := db.bufPool.Get()
