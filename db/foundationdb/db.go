@@ -37,7 +37,7 @@ type fDB struct {
 	bufPool *util.BufPool
 }
 
-func (db *fDB) CommitToTaas(ctx context.Context, table string, keys []string, values []map[string][]byte) error {
+func (db *fDB) TxnCommit(ctx context.Context, table string, keys []string, values []map[string][]byte) error {
 	var readOpNum, writeOpNum uint64 = 0, 0
 	_, err := db.db.Transact(func(tr fdb.Transaction) (interface{}, error) {
 		time1 := time.Now()

@@ -203,7 +203,7 @@ func (db *txnDB) Update(ctx context.Context, table string, key string, values ma
 	//GzipedTransaction := bufferBeforeGzip.Bytes()
 	//TaasTxnCH <- TaasTxn{GzipedTransaction}
 	//
-	//result, ok := <-(ChanList[txnId%2048])
+	//result, ok := <-(ChanList[txnId%uint64(taas.ClientNum)])
 	//if ok {
 	//	if result != "Commit" {
 	//		atomic.AddUint64(&FailedTransactionCounter, 1)

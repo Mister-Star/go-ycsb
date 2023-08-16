@@ -3,15 +3,14 @@ package taas_leveldb
 import (
 	"context"
 	"fmt"
-	"github.com/pingcap/go-ycsb/db/taas"
-	"sync/atomic"
-
 	"github.com/icexin/brpc-go"
 	bstd "github.com/icexin/brpc-go/protocol/brpc-std"
 	"github.com/magiconair/properties"
+	"github.com/pingcap/go-ycsb/db/taas"
 	"github.com/pingcap/go-ycsb/pkg/util"
 	"github.com/pingcap/go-ycsb/pkg/ycsb"
 	"github.com/syndtr/goleveldb/leveldb"
+	"sync/atomic"
 )
 
 type txnConfig struct {
@@ -30,13 +29,13 @@ var LeveldbConnection []*leveldb.DB
 var ClientConnectionNum int = 256
 
 func createTxnDB(p *properties.Properties) (ycsb.DB, error) {
-	taas.TaasServerIp = p.GetString("taasServerIp", "")
-	// leveldb找到本地leveldb数据库文件夹进行连接，不用管
-	dir := p.GetString("leveldb.dir", "/tmp/leveldb_simple_example")
-	db, _ := leveldb.OpenFile(dir, nil)
+	//taas.TaasServerIp = p.GetString("taasServerIp", "")
+	//// leveldb找到本地leveldb数据库文件夹进行连接，不用管
+	//dir := p.GetString("leveldb.dir", "/tmp/leveldb_simple_example")
+	//db, _ := leveldb.OpenFile(dir, nil)
 
 	// 连接远端brpc
-	endpoint := p.GetString(bstd.ProtocolName, "127.0.0.1:2379")
+	endpoint := p.GetString(bstd.ProtocolName, taas.LevelDBServerIP)
 	clientConn, err := brpc.Dial(bstd.ProtocolName, endpoint)
 	client := new(LeveldbClient)
 	client.conn = clientConn
@@ -44,7 +43,7 @@ func createTxnDB(p *properties.Properties) (ycsb.DB, error) {
 		return nil, err
 	}
 	return &txnDB{
-		db:      db,
+		db:      nil,
 		client:  *client,
 		r:       util.NewRowCodec(p),
 		bufPool: util.NewBufPool(),
@@ -52,7 +51,8 @@ func createTxnDB(p *properties.Properties) (ycsb.DB, error) {
 }
 
 func (db *txnDB) Close() error {
-	return db.db.Close()
+	//return db.db.Close()
+	return nil
 }
 
 func (db *txnDB) InitThread(ctx context.Context, _ int, _ int) context.Context {
@@ -94,8 +94,9 @@ func (db *txnDB) BatchRead(ctx context.Context, table string, keys []string, fie
 
 // no need for scan there's no proto for this action
 func (db *txnDB) Scan(ctx context.Context, table string, startKey string, count int, fields []string) ([]map[string][]byte, error) {
+	fmt.Println("do not use func Scan()")
 	res := make([]map[string][]byte, count)
-	it := db.db.NewIterator(nil, nil)
+	it := db.db.NewIterator(nil, nil) // db.db is nil
 	defer it.Release()
 
 	rowStartKey := db.getRowKey(table, startKey)
@@ -116,7 +117,7 @@ func (db *txnDB) Scan(ctx context.Context, table string, startKey string, count 
 
 // unfinished Update, no need for batch there's no proto for this action?
 func (db *txnDB) Update(ctx context.Context, table string, key string, values map[string][]byte) error {
-	fmt.Println("unsure Update()")
+	fmt.Println("do not use func Update()")
 	// original version
 	// rowKey := db.getRowKey(table, key)
 	m, err := db.Read(ctx, table, key, nil)
@@ -141,7 +142,7 @@ func (db *txnDB) Update(ctx context.Context, table string, key string, values ma
 
 // unfinished batchUpdate, no need for scan there's no proto for this action
 func (db *txnDB) BatchUpdate(ctx context.Context, table string, keys []string, values []map[string][]byte) error {
-	fmt.Println("unsure BatchUpdate()")
+	fmt.Println("do not use func BatchUpdate()")
 	txnId := atomic.AddUint64(&taas.CSNCounter, 1) // return new value
 	atomic.AddUint64(&taas.TotalTransactionCounter, 1)
 
@@ -164,7 +165,7 @@ func (db *txnDB) BatchUpdate(ctx context.Context, table string, keys []string, v
 		batch.Put(rowKey, buf)
 	}
 
-	return db.db.Write(batch, nil)
+	return db.db.Write(batch, nil) // db.db is nil
 }
 
 func (db *txnDB) Insert(ctx context.Context, table string, key string, values map[string][]byte) error {
@@ -196,17 +197,19 @@ func (db *txnDB) BatchInsert(ctx context.Context, table string, keys []string, v
 
 // no need for scan there's no proto for this action
 func (db *txnDB) Delete(ctx context.Context, table string, key string) error {
+	panic("do not use func Delete")
 	batch := new(leveldb.Batch)
 	rowKey := db.getRowKey(table, key)
 	batch.Delete(rowKey)
-	return db.db.Write(batch, nil)
+	return db.db.Write(batch, nil) //db.db is nil
 }
 
 // no need for scan there's no proto for this action
 func (db *txnDB) BatchDelete(ctx context.Context, table string, keys []string) error {
+	panic("do not use func BatchDelete")
 	batch := new(leveldb.Batch)
 	for _, key := range keys {
 		batch.Delete(db.getRowKey(table, key))
 	}
-	return db.db.Write(batch, nil)
+	return db.db.Write(batch, nil) //db.db is nil
 }

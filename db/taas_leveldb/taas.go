@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"context"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"github.com/pingcap/go-ycsb/db/taas"
@@ -66,13 +67,14 @@ func (db *txnDB) TxnCommit(ctx context.Context, table string, keys []string, val
 			writeOpNum++
 			rowKey := db.getRowKey(table, key)
 			rowData, err := db.r.Encode(nil, values[i])
+			utf8Value := base64.StdEncoding.EncodeToString(rowData)
 			if err != nil {
 				return err
 			}
 			sendRow := taas_proto.Row{
 				OpType: taas_proto.OpType_Update,
 				Key:    *(*[]byte)(unsafe.Pointer(&rowKey)),
-				Data:   []byte(rowData),
+				Data:   []byte(utf8Value),
 			}
 			txnSendToTaas.Row = append(txnSendToTaas.Row, &sendRow)
 			//fmt.Print("; Update, key : " + string(rowKey))
@@ -105,7 +107,7 @@ func (db *txnDB) TxnCommit(ctx context.Context, table string, keys []string, val
 	//fmt.Println("Send to Taas")
 	taas.TaasTxnCH <- taas.TaasTxn{GzipedTransaction} // 发送压缩后的数据
 
-	result, ok := <-(taas.ChanList[txnId%2048])
+	result, ok := <-(taas.ChanList[txnId%uint64(taas.ClientNum)])
 	//fmt.Println("Receive From Taas")
 	t2 := uint64(time.Now().UnixNano() - t1)
 	taas.TotalLatency += t2

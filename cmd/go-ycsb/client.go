@@ -39,6 +39,19 @@ func runClientCommandFunc(cmd *cobra.Command, args []string, doTransactions bool
 	dbName := args[0]
 
 	initialGlobal(dbName, func() {
+		fmt.Println("****************** Connect To Taas ***************************")
+		taas.SetConfig(globalProps)
+		for i := 0; i < taas.ClientNum; i++ {
+			taas.ChanList = append(taas.ChanList, make(chan string, 100000))
+		}
+		go taas.SendTxnToTaas()
+		go taas.ListenFromTaas()
+		for i := 0; i < taas.UnPackNum; i++ {
+			go taas.UnPack()
+		}
+		taas.InitOk = 1
+		fmt.Println("****************** Connect To Taas Finished ******************")
+
 		doTransFlag := "true"
 		if !doTransactions {
 			doTransFlag = "false"
@@ -65,19 +78,6 @@ func runClientCommandFunc(cmd *cobra.Command, args []string, doTransactions bool
 		fmt.Printf("\"%s\"=\"%s\"\n", key, value)
 	}
 	fmt.Println("**********************************************")
-
-	fmt.Println("****************** Connect To Taas ***************************")
-	taas.SetConfig(globalProps)
-	for i := 0; i < taas.ClientNum; i++ {
-		taas.ChanList = append(taas.ChanList, make(chan string, 100000))
-	}
-	go taas.SendTxnToTaas()
-	go taas.ListenFromTaas()
-	for i := 0; i < taas.UnPackNum; i++ {
-		go taas.UnPack()
-	}
-	taas.InitOk = 1
-	fmt.Println("****************** Connect To Taas Finished ******************")
 
 	c := client.NewClient(globalProps, globalWorkload, globalDB)
 	start := time.Now()

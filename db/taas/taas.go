@@ -21,6 +21,7 @@ var LocalServerIp = "127.0.0.1"
 var TaasServerIp = "127.0.0.1"
 var StorageServerIp = "127.0.0.1"
 var HbaseServerIp = "127.0.0.1"
+var LevelDBServerIP = "127.0.0.1"
 
 var OpNum = 10
 var ClientNum = 64
@@ -47,12 +48,13 @@ func SetConfig(globalProps *properties.Properties) {
 	LocalServerIp = globalProps.GetString("localServerIp", "127.0.0.1")
 	StorageServerIp = globalProps.GetString("storageServerIp", "127.0.0.1")
 	HbaseServerIp = globalProps.GetString("hbaseServerIp", "127.0.0.1")
+	LevelDBServerIP = globalProps.GetString("levelDBServerIp", "127.0.0.1")
 
 	OpNum = globalProps.GetInt("opNum", 1)
 	ClientNum = globalProps.GetInt("threadcount", 64)
 	UnPackNum = globalProps.GetInt("unpackNum", 16)
 
-	fmt.Println("localServerIp : " + LocalServerIp + ", taasServerIp : " + TaasServerIp + ", hbaseServerIp " + HbaseServerIp + " ;")
+	fmt.Println("localServerIp : " + LocalServerIp + ", taasServerIp : " + TaasServerIp + ", hbaseServerIp " + HbaseServerIp + ", levelDBServerIp " + LevelDBServerIP)
 
 }
 
