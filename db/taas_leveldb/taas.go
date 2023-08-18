@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"github.com/pingcap/go-ycsb/db/taas"
 	"log"
-	"strconv"
 	"sync/atomic"
 	"time"
 	"unsafe"
@@ -84,7 +83,7 @@ func (db *txnDB) TxnCommit(ctx context.Context, table string, keys []string, val
 
 	timeLen := time.Now().Sub(time1)
 	atomic.AddUint64(&taas.TikvTotalLatency, uint64(timeLen))
-	fmt.Println("; read op : " + strconv.FormatUint(readOpNum, 10) + ", write op : " + strconv.FormatUint(writeOpNum, 10))
+	//fmt.Println("; read op : " + strconv.FormatUint(readOpNum, 10) + ", write op : " + strconv.FormatUint(writeOpNum, 10))
 
 	sendMessage := &taas_proto.Message{ // 存储发送给Taas的消息数据
 		Type: &taas_proto.Message_Txn{Txn: &txnSendToTaas},
