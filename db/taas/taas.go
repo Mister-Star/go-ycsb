@@ -1,12 +1,9 @@
 package taas
 
 import (
-	"bytes"
-	"compress/gzip"
 	"fmt"
 	"github.com/magiconair/properties"
 	zmq "github.com/pebbe/zmq4"
-	"io/ioutil"
 	"log"
 )
 
@@ -130,25 +127,43 @@ func ListenFromTaas() {
 	}
 }
 
-func UGZipBytes(in []byte) []byte {
-	reader, err := gzip.NewReader(bytes.NewReader(in))
-	if err != nil {
-		var out []byte
-		return out
-	}
-	defer reader.Close()
-	out, _ := ioutil.ReadAll(reader)
-	return out
+func UGZipBytes(in []byte) ([]byte, error) {
+	//reader, err := gzip.NewReader(bytes.NewReader(in))
+	//if err != nil {
+	//	return nil, err
+	//}
+	//defer reader.Close()
+	//out, _ := ioutil.ReadAll(reader)
+	//return out, nil
+	return in, nil
+}
 
+func GzipBytes(in []byte) ([]byte, error) {
+	//var bufferBeforeGzip bytes.Buffer
+	//bufferBeforeGzip.Reset()
+	//gw := gzip.NewWriter(&bufferBeforeGzip)
+	//_, err := gw.Write(in)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//err = gw.Close()
+	//if err != nil {
+	//	return nil, err
+	//}
+	//return bufferBeforeGzip.Bytes(), nil
+	return in, nil
 }
 
 func UnPack() {
 	for {
 		taasReply, ok := <-UnPackCH
 		if ok {
-			//UnGZipedReply := UGZipBytes([]byte(taasReply))
+			UnGZipedReply, err := UGZipBytes([]byte(taasReply))
+			if err != nil {
+				panic("UnGzip error")
+			}
 			testMessage := &taas_proto.Message{}
-			err := proto.Unmarshal([]byte(taasReply), testMessage)
+			err = proto.Unmarshal(UnGZipedReply, testMessage)
 			if err != nil {
 				fmt.Println("taas.go 142")
 				log.Fatal(err)

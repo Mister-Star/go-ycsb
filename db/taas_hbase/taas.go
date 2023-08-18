@@ -1,8 +1,6 @@
 package taas_hbase
 
 import (
-	"bytes"
-	"compress/gzip"
 	"fmt"
 	"github.com/pingcap/errors"
 	"github.com/pingcap/go-ycsb/db/taas"
@@ -100,22 +98,15 @@ func (db *txnDB) TxnCommit(ctx context.Context, table string, keys []string, val
 	sendMessage := &taas_proto.Message{
 		Type: &taas_proto.Message_Txn{Txn: &txnSendToTaas},
 	}
-	var bufferBeforeGzip bytes.Buffer
-	sendBuffer, _ := proto.Marshal(sendMessage)
-	bufferBeforeGzip.Reset()
-	gw := gzip.NewWriter(&bufferBeforeGzip)
-	_, err := gw.Write(sendBuffer)
+	sendBuffer, err := proto.Marshal(sendMessage)
 	if err != nil {
 		return err
 	}
-	err = gw.Close()
+	sendString, err := taas.GzipBytes(sendBuffer)
 	if err != nil {
 		return err
 	}
-	GzipedTransaction := bufferBeforeGzip.Bytes()
-	GzipedTransaction = GzipedTransaction
-	//fmt.Println("Send to Taas")
-	taas.TaasTxnCH <- taas.TaasTxn{GzipedTransaction}
+	taas.TaasTxnCH <- taas.TaasTxn{GzipedTransaction: sendString}
 
 	result, ok := <-(taas.ChanList[txnId%uint64(taas.ClientNum)])
 	//fmt.Println("Receive From Taas")

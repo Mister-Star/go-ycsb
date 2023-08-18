@@ -113,7 +113,6 @@ func (db *txnDB) TxnCommit(ctx context.Context, table string, keys []string, val
 		return err
 	}
 	GzipedTransaction := bufferBeforeGzip.Bytes()
-	GzipedTransaction = GzipedTransaction
 	//fmt.Println("Send to Taas")
 	taas.TaasTxnCH <- taas.TaasTxn{GzipedTransaction}
 

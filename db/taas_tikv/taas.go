@@ -98,21 +98,15 @@ func (db *txnDB) TxnCommit(ctx context.Context, table string, keys []string, val
 	sendMessage := &taas_proto.Message{
 		Type: &taas_proto.Message_Txn{Txn: &txnSendToTaas},
 	}
-	sendBuffer, _ := proto.Marshal(sendMessage)
-	//var bufferBeforeGzip bytes.Buffer
-	//bufferBeforeGzip.Reset()
-	//gw := gzip.NewWriter(&bufferBeforeGzip)
-	//_, err = gw.Write(sendBuffer)
-	//if err != nil {
-	//	return err
-	//}
-	//err = gw.Close()
-	//if err != nil {
-	//	return err
-	//}
-	//GzipedTransaction := bufferBeforeGzip.Bytes()
-	//taas.TaasTxnCH <- taas.TaasTxn{GzipedTransaction: GzipedTransaction}
-	taas.TaasTxnCH <- taas.TaasTxn{GzipedTransaction: sendBuffer}
+	sendBuffer, err := proto.Marshal(sendMessage)
+	if err != nil {
+		return err
+	}
+	sendString, err := taas.GzipBytes(sendBuffer)
+	if err != nil {
+		return err
+	}
+	taas.TaasTxnCH <- taas.TaasTxn{GzipedTransaction: sendString}
 
 	result, ok := <-(taas.ChanList[txnId%uint64(taas.ClientNum)])
 	//fmt.Println("receive from taas")

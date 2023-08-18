@@ -2,14 +2,13 @@ package taas_leveldb
 
 //#include ""
 import (
-	"bytes"
-	"compress/gzip"
 	"context"
 	"encoding/base64"
 	"errors"
 	"fmt"
 	"github.com/pingcap/go-ycsb/db/taas"
 	"log"
+	"strconv"
 	"sync/atomic"
 	"time"
 	"unsafe"
@@ -85,27 +84,20 @@ func (db *txnDB) TxnCommit(ctx context.Context, table string, keys []string, val
 
 	timeLen := time.Now().Sub(time1)
 	atomic.AddUint64(&taas.TikvTotalLatency, uint64(timeLen))
-	//fmt.Println("; read op : " + strconv.FormatUint(readOpNum, 10) + ", write op : " + strconv.FormatUint(writeOpNum, 10))
+	fmt.Println("; read op : " + strconv.FormatUint(readOpNum, 10) + ", write op : " + strconv.FormatUint(writeOpNum, 10))
 
 	sendMessage := &taas_proto.Message{ // 存储发送给Taas的消息数据
 		Type: &taas_proto.Message_Txn{Txn: &txnSendToTaas},
 	}
-	var bufferBeforeGzip bytes.Buffer           // 存储压缩前的数据
-	sendBuffer, _ := proto.Marshal(sendMessage) // 序列化
-	bufferBeforeGzip.Reset()
-	gw := gzip.NewWriter(&bufferBeforeGzip) // 用于压缩数据
-	_, err := gw.Write(sendBuffer)
+	sendBuffer, err := proto.Marshal(sendMessage)
 	if err != nil {
 		return err
 	}
-	err = gw.Close()
+	sendString, err := taas.GzipBytes(sendBuffer)
 	if err != nil {
 		return err
 	}
-	GzipedTransaction := bufferBeforeGzip.Bytes() // 获取压缩后的数据
-	// GzipedTransaction = GzipedTransaction
-	//fmt.Println("Send to Taas")
-	taas.TaasTxnCH <- taas.TaasTxn{GzipedTransaction} // 发送压缩后的数据
+	taas.TaasTxnCH <- taas.TaasTxn{GzipedTransaction: sendString}
 
 	result, ok := <-(taas.ChanList[txnId%uint64(taas.ClientNum)])
 	//fmt.Println("Receive From Taas")
