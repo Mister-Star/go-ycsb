@@ -146,9 +146,9 @@ func UnPack() {
 	for {
 		taasReply, ok := <-UnPackCH
 		if ok {
-			UnGZipedReply := UGZipBytes([]byte(taasReply))
+			//UnGZipedReply := UGZipBytes([]byte(taasReply))
 			testMessage := &taas_proto.Message{}
-			err := proto.Unmarshal(UnGZipedReply, testMessage)
+			err := proto.Unmarshal([]byte(taasReply), testMessage)
 			if err != nil {
 				fmt.Println("taas.go 142")
 				log.Fatal(err)

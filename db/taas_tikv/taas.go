@@ -1,8 +1,6 @@
 package taas_tikv
 
 import (
-	"bytes"
-	"compress/gzip"
 	"context"
 	"fmt"
 	"github.com/golang/protobuf/proto"
@@ -100,20 +98,21 @@ func (db *txnDB) TxnCommit(ctx context.Context, table string, keys []string, val
 	sendMessage := &taas_proto.Message{
 		Type: &taas_proto.Message_Txn{Txn: &txnSendToTaas},
 	}
-	var bufferBeforeGzip bytes.Buffer
 	sendBuffer, _ := proto.Marshal(sendMessage)
-	bufferBeforeGzip.Reset()
-	gw := gzip.NewWriter(&bufferBeforeGzip)
-	_, err = gw.Write(sendBuffer)
-	if err != nil {
-		return err
-	}
-	err = gw.Close()
-	if err != nil {
-		return err
-	}
-	GzipedTransaction := bufferBeforeGzip.Bytes()
-	taas.TaasTxnCH <- taas.TaasTxn{GzipedTransaction: GzipedTransaction}
+	//var bufferBeforeGzip bytes.Buffer
+	//bufferBeforeGzip.Reset()
+	//gw := gzip.NewWriter(&bufferBeforeGzip)
+	//_, err = gw.Write(sendBuffer)
+	//if err != nil {
+	//	return err
+	//}
+	//err = gw.Close()
+	//if err != nil {
+	//	return err
+	//}
+	//GzipedTransaction := bufferBeforeGzip.Bytes()
+	//taas.TaasTxnCH <- taas.TaasTxn{GzipedTransaction: GzipedTransaction}
+	taas.TaasTxnCH <- taas.TaasTxn{GzipedTransaction: sendBuffer}
 
 	result, ok := <-(taas.ChanList[txnId%uint64(taas.ClientNum)])
 	//fmt.Println("receive from taas")
