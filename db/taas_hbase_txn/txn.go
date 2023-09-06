@@ -8,11 +8,11 @@ import (
 	"net"
 	"reflect"
 	"sync/atomic"
+	"time"
 
 	"github.com/magiconair/properties"
 	"github.com/pingcap/go-ycsb/pkg/util"
 	"github.com/pingcap/go-ycsb/pkg/ycsb"
-	"strconv"
 )
 
 import (
@@ -48,13 +48,16 @@ var HBaseConncetion []*THBaseServiceClient
 func createTxnDB(p *properties.Properties) (ycsb.DB, error) {
 
 	for i := 0; i < taas.ClientNum; i++ {
-		protocolFactory := thrift.NewTBinaryProtocolFactoryDefault()
-		transport, err := thrift.NewTSocket(net.JoinHostPort(taas.HbaseServerIp, strconv.Itoa(9090)))
-		if err != nil {
-			return nil, err
-		}
+		protocolFactory := thrift.NewTBinaryProtocolFactoryConf(&thrift.TConfiguration{
+			TBinaryStrictRead:  thrift.BoolPtr(true),
+			TBinaryStrictWrite: thrift.BoolPtr(true),
+		})
+		transport := thrift.NewTSocketConf(net.JoinHostPort(HOST, PORT), &thrift.TConfiguration{
+			ConnectTimeout: time.Second * 30,
+			SocketTimeout:  time.Second * 30,
+		})
 		client := NewTHBaseServiceClientFactory(transport, protocolFactory)
-		err = transport.Open()
+		err := transport.Open()
 		if err != nil {
 			return nil, err
 		}

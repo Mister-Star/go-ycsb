@@ -3,16 +3,13 @@ package taas_hbase
 import (
 	"fmt"
 	"github.com/apache/thrift/lib/go/thrift"
-	"github.com/pingcap/go-ycsb/db/taas"
-	"github.com/tikv/client-go/v2/txnkv/transaction"
-	"net"
-	"reflect"
-	"sync/atomic"
-
 	"github.com/magiconair/properties"
 	"github.com/pingcap/go-ycsb/pkg/util"
 	"github.com/pingcap/go-ycsb/pkg/ycsb"
-	"strconv"
+	"github.com/tikv/client-go/v2/txnkv/transaction"
+	"net"
+	"reflect"
+	"time"
 )
 
 import (
@@ -47,19 +44,22 @@ var HBaseConncetion []*THBaseServiceClient
 
 func createTxnDB(p *properties.Properties) (ycsb.DB, error) {
 
-	for i := 0; i < taas.ClientNum; i++ {
-		protocolFactory := thrift.NewTBinaryProtocolFactoryDefault()
-		transport, err := thrift.NewTSocket(net.JoinHostPort(taas.HbaseServerIp, strconv.Itoa(9090)))
-		if err != nil {
-			return nil, err
-		}
-		client := NewTHBaseServiceClientFactory(transport, protocolFactory)
-		err = transport.Open()
-		if err != nil {
-			return nil, err
-		}
-		HBaseConncetion = append(HBaseConncetion, client)
-	}
+	//for i := 0; i < taas.ClientNum; i++ {
+	//	protocolFactory := thrift.NewTBinaryProtocolFactoryConf(&thrift.TConfiguration{
+	//		TBinaryStrictRead:  thrift.BoolPtr(true),
+	//		TBinaryStrictWrite: thrift.BoolPtr(true),
+	//	})
+	//	transport := thrift.NewTSocketConf(net.JoinHostPort(HOST, PORT), &thrift.TConfiguration{
+	//		ConnectTimeout: time.Second * 5,
+	//		SocketTimeout:  time.Second * 5,
+	//	})
+	//	client := NewTHBaseServiceClientFactory(transport, protocolFactory)
+	//	err := transport.Open()
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//	HBaseConncetion = append(HBaseConncetion, client)
+	//}
 
 	bufPool := util.NewBufPool()
 
@@ -241,7 +241,23 @@ func (db *txnDB) BatchUpdate(ctx context.Context, table string, keys []string, v
 }
 
 func (db *txnDB) Insert(ctx context.Context, table string, key string, values map[string][]byte) error {
-	txnId := atomic.AddUint64(&taas.CSNCounter, 1)
+
+	protocolFactory := thrift.NewTBinaryProtocolFactoryConf(&thrift.TConfiguration{
+		TBinaryStrictRead:  thrift.BoolPtr(true),
+		TBinaryStrictWrite: thrift.BoolPtr(true),
+	})
+	transport := thrift.NewTSocketConf(net.JoinHostPort(HOST, PORT), &thrift.TConfiguration{
+		ConnectTimeout: time.Second * 5,
+		SocketTimeout:  time.Second * 5,
+	})
+	client := NewTHBaseServiceClientFactory(transport, protocolFactory)
+	err := transport.Open()
+	if err != nil {
+		return err
+	}
+	defer transport.Close()
+
+	//txnId := atomic.AddUint64(&taas.CSNCounter, 1)
 	var cvarr []*TColumnValue
 	finalData, err1 := db.r.Encode(nil, values)
 	if err1 != nil {
@@ -254,10 +270,11 @@ func (db *txnDB) Insert(ctx context.Context, table string, key string, values ma
 	})
 
 	tempTPut := TPut{Row: []byte(key), ColumnValues: cvarr}
-	err := HBaseConncetion[txnId%uint64(taas.ClientNum)].Put(ctx, []byte(table), &tempTPut)
+	err = client.Put(ctx, []byte(table), &tempTPut)
 	if err != nil {
 		fmt.Println(err)
 	}
+
 	return err
 }
 
