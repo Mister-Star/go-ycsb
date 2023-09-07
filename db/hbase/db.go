@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package taas_hbase
+package hbase
 
 import (
 	"fmt"
@@ -31,11 +31,11 @@ import (
 //	tikvAPIVersion = "tikv.apiversion"
 //)
 
-type taasHbaseCreator struct {
+type hbaseCreator struct {
 }
 
-func (c taasHbaseCreator) Create(p *properties.Properties) (ycsb.DB, error) {
-	fmt.Println("=====================  Taas - HBase  ============================")
+func (c hbaseCreator) Create(p *properties.Properties) (ycsb.DB, error) {
+	fmt.Println("=====================  HBase  ============================")
 
 	protocolFactory := thrift.NewTBinaryProtocolFactoryConf(&thrift.TConfiguration{
 		TBinaryStrictRead:  thrift.BoolPtr(true),
@@ -56,5 +56,5 @@ func (c taasHbaseCreator) Create(p *properties.Properties) (ycsb.DB, error) {
 }
 
 func init() {
-	ycsb.RegisterDBCreator("taas_hbase", taasHbaseCreator{})
+	ycsb.RegisterDBCreator("hbase", hbaseCreator{})
 }

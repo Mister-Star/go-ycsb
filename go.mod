@@ -161,6 +161,8 @@ replace (
 	github.com/pingcap/go-ycsb/db/taas_tikv_txn => ./taas_tikv_txn
 	github.com/pingcap/go-ycsb/db/tikv => ./tikv
 	github.com/pingcap/go-ycsb/db/tikv_txn => ./tikv_txn
+	github.com/pingcap/go-ycsb/db/leveldb_txn => ./leveldb_txn
+	github.com/pingcap/go-ycsb/db/hbase => ./hbase
 )
 
 go 1.18

@@ -1,4 +1,4 @@
-package taas_hbase
+package hbase
 
 import (
 	"fmt"
@@ -40,8 +40,6 @@ type txnDB struct {
 	protocolFactory *thrift.TProtocolFactory
 }
 
-var HBaseConncetion []*THBaseServiceClient
-
 func createTxnDB(p *properties.Properties) (ycsb.DB, error) {
 	bufPool := util.NewBufPool()
 
@@ -52,7 +50,6 @@ func createTxnDB(p *properties.Properties) (ycsb.DB, error) {
 }
 
 func (db *txnDB) Close() error {
-	//seems that HBase
 	return db.transport.Close()
 }
 
@@ -168,6 +165,7 @@ func (db *txnDB) Insert(ctx context.Context, table string, key string, values ma
 		Qualifier: []byte(""),
 		Value:     []byte(string(finalData)),
 	})
+
 	rowKey := db.getRowKey(table, key)
 	tempTPut := TPut{Row: []byte(rowKey), ColumnValues: cvarr}
 	err = client.Put(ctx, []byte(table), &tempTPut)

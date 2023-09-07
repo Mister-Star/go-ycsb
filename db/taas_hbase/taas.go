@@ -2,9 +2,11 @@ package taas_hbase
 
 import (
 	"fmt"
+	"github.com/apache/thrift/lib/go/thrift"
 	"github.com/pingcap/errors"
 	"github.com/pingcap/go-ycsb/db/taas"
 	"log"
+	"net"
 	"reflect"
 	"sync/atomic"
 	"time"
@@ -37,6 +39,21 @@ func (db *txnDB) TxnCommit(ctx context.Context, table string, keys []string, val
 		TxnState:    0,
 	}
 
+	protocolFactory := thrift.NewTBinaryProtocolFactoryConf(&thrift.TConfiguration{
+		TBinaryStrictRead:  thrift.BoolPtr(true),
+		TBinaryStrictWrite: thrift.BoolPtr(true),
+	})
+	transport := thrift.NewTSocketConf(net.JoinHostPort(HOST, PORT), &thrift.TConfiguration{
+		ConnectTimeout: time.Second * 5,
+		SocketTimeout:  time.Second * 5,
+	})
+	client := NewTHBaseServiceClientFactory(transport, protocolFactory)
+	err := transport.Open()
+	if err != nil {
+		return err
+	}
+	defer transport.Close()
+
 	var readOpNum, writeOpNum uint64 = 0, 0
 	time1 := time.Now()
 	for i, key := range keys {
@@ -44,7 +61,7 @@ func (db *txnDB) TxnCommit(ctx context.Context, table string, keys []string, val
 			readOpNum++
 			rowKey := db.getRowKey(table, key)
 			time2 := time.Now()
-			rowData, err := HBaseConncetion[txnId].Get(ctx, []byte(table), &TGet{Row: []byte(key)})
+			rowData, err := client.Get(ctx, []byte(table), &TGet{Row: []byte(rowKey)})
 			if err != nil {
 				return err
 			} else if rowData == nil {
@@ -83,14 +100,10 @@ func (db *txnDB) TxnCommit(ctx context.Context, table string, keys []string, val
 				Data:   []byte(rowData),
 			}
 			txnSendToTaas.Row = append(txnSendToTaas.Row, &sendRow)
-			//fmt.Print("; Update, key : " + string(rowKey))
-			//fmt.Println("; Write, key : " + string(rowKey) + " Data : " + string(rowData))
 		}
 
 	}
-	//if err = tx.Commit(ctx); err != nil {
-	//	return err
-	//}
+
 	timeLen := time.Now().Sub(time1)
 	atomic.AddUint64(&taas.TikvTotalLatency, uint64(timeLen))
 	//fmt.Println("; read op : " + strconv.FormatUint(readOpNum, 10) + ", write op : " + strconv.FormatUint(writeOpNum, 10))

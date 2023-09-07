@@ -78,7 +78,7 @@ import (
 	_ "github.com/pingcap/go-ycsb/db/taas_leveldb"
 	// Register taas-hbase
 	_ "github.com/pingcap/go-ycsb/db/taas_hbase"
-	// Register taas-hbase
+	// Register taas_hbase_txn
 	_ "github.com/pingcap/go-ycsb/db/taas_hbase_txn"
 	// Register taas-tikv
 	_ "github.com/pingcap/go-ycsb/db/taas_tikv"
@@ -88,6 +88,10 @@ import (
 	_ "github.com/pingcap/go-ycsb/db/tikv"
 	// Register taas-tikv
 	_ "github.com/pingcap/go-ycsb/db/tikv_txn"
+	// Register hbase
+	_ "github.com/pingcap/go-ycsb/db/hbase"
+	// Register leveldb_txn
+	_ "github.com/pingcap/go-ycsb/db/leveldb_txn"
 )
 
 var (

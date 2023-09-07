@@ -1,4 +1,4 @@
-package taas_leveldb
+package leveldb_txn
 
 import (
 	"context"
@@ -20,20 +20,17 @@ type txnConfig struct {
 
 type txnDB struct {
 	db      *leveldb.DB
-	client  LeveldbClient
+	client  LeveldbTxnClient
 	r       *util.RowCodec
 	bufPool *util.BufPool
 }
-
-var LeveldbConnection []*leveldb.DB
-var ClientConnectionNum int = 256
 
 func createTxnDB(p *properties.Properties) (ycsb.DB, error) {
 
 	// 连接远端brpc
 	endpoint := p.GetString(bstd.ProtocolName, taas.LevelDBServerIP)
 	clientConn, err := brpc.Dial(bstd.ProtocolName, endpoint)
-	client := new(LeveldbClient)
+	client := new(LeveldbTxnClient)
 	client.conn = clientConn
 	if err != nil {
 		return nil, err
@@ -47,7 +44,6 @@ func createTxnDB(p *properties.Properties) (ycsb.DB, error) {
 }
 
 func (db *txnDB) Close() error {
-	//return db.db.Close()
 	return nil
 }
 
@@ -114,10 +110,8 @@ func (db *txnDB) Scan(ctx context.Context, table string, startKey string, count 
 // unfinished Update, no need for batch there's no proto for this action?
 func (db *txnDB) Update(ctx context.Context, table string, key string, values map[string][]byte) error {
 	fmt.Println("do not use func Update()")
-	// original version
-	// rowKey := db.getRowKey(table, key)
+
 	m, err := db.Read(ctx, table, key, nil)
-	// fmt.Println(m)
 	if err != nil {
 		return err
 	}
@@ -125,14 +119,6 @@ func (db *txnDB) Update(ctx context.Context, table string, key string, values ma
 		m[field] = value
 	}
 
-	// buf := db.bufPool.Get()
-	// buf, err = db.r.Encode(buf, values)
-	// if err != nil {
-	// 	return err
-	// }
-
-	// batch := new(leveldb.Batch)
-	// batch.Put(rowKey, buf)
 	return db.Insert(ctx, table, key, m)
 }
 

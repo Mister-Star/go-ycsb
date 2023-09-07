@@ -16,7 +16,6 @@ package leveldb
 import (
 	"context"
 	"fmt"
-
 	"github.com/magiconair/properties"
 	"github.com/pingcap/go-ycsb/pkg/util"
 	"github.com/pingcap/go-ycsb/pkg/ycsb"
@@ -31,6 +30,11 @@ type levelDB struct {
 	r       *util.RowCodec
 	bufPool *util.BufPool
 }
+
+func (db *levelDB) TxnCommit(ctx context.Context, table string, keys []string, values []map[string][]byte) error {
+	panic("implement me")
+}
+
 type leveldbCreator struct {
 }
 
@@ -48,7 +52,6 @@ func (c leveldbCreator) Create(p *properties.Properties) (ycsb.DB, error) {
 }
 
 func (db *levelDB) CommitToTaas(ctx context.Context, table string, keys []string, values []map[string][]byte) error {
-	//TODO implement me
 	panic("implement me")
 }
 
