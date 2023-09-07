@@ -26,7 +26,7 @@ func (db *txnDB) TxnCommit(ctx context.Context, table string, keys []string, val
 		TBinaryStrictRead:  thrift.BoolPtr(true),
 		TBinaryStrictWrite: thrift.BoolPtr(true),
 	})
-	transport := thrift.NewTSocketConf(net.JoinHostPort(HOST, PORT), &thrift.TConfiguration{
+	transport := thrift.NewTSocketConf(net.JoinHostPort(taas.HbaseServerIp, PORT), &thrift.TConfiguration{
 		ConnectTimeout: time.Second * 5,
 		SocketTimeout:  time.Second * 5,
 	})

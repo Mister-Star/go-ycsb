@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/apache/thrift/lib/go/thrift"
 	"github.com/magiconair/properties"
+	"github.com/pingcap/go-ycsb/db/taas"
 	"github.com/pingcap/go-ycsb/pkg/util"
 	"github.com/pingcap/go-ycsb/pkg/ycsb"
 	"github.com/tikv/client-go/v2/txnkv/transaction"
@@ -22,7 +23,6 @@ import (
 //)
 
 const (
-	HOST = "127.0.0.1"
 	PORT = "9090"
 )
 
@@ -146,7 +146,7 @@ func (db *txnDB) Insert(ctx context.Context, table string, key string, values ma
 		TBinaryStrictRead:  thrift.BoolPtr(true),
 		TBinaryStrictWrite: thrift.BoolPtr(true),
 	})
-	transport := thrift.NewTSocketConf(net.JoinHostPort(HOST, PORT), &thrift.TConfiguration{
+	transport := thrift.NewTSocketConf(net.JoinHostPort(taas.HbaseServerIp, PORT), &thrift.TConfiguration{
 		ConnectTimeout: time.Second * 5,
 		SocketTimeout:  time.Second * 5,
 	})

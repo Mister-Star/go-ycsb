@@ -25,7 +25,6 @@ import (
 //)
 
 const (
-	HOST = "127.0.0.1"
 	PORT = "9090"
 )
 
@@ -52,7 +51,7 @@ func createTxnDB(p *properties.Properties) (ycsb.DB, error) {
 			TBinaryStrictRead:  thrift.BoolPtr(true),
 			TBinaryStrictWrite: thrift.BoolPtr(true),
 		})
-		transport := thrift.NewTSocketConf(net.JoinHostPort(HOST, PORT), &thrift.TConfiguration{
+		transport := thrift.NewTSocketConf(net.JoinHostPort(taas.HbaseServerIp, PORT), &thrift.TConfiguration{
 			ConnectTimeout: time.Second * 30,
 			SocketTimeout:  time.Second * 30,
 		})

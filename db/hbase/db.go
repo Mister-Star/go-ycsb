@@ -17,6 +17,7 @@ import (
 	"fmt"
 	"github.com/apache/thrift/lib/go/thrift"
 	"github.com/magiconair/properties"
+	"github.com/pingcap/go-ycsb/db/taas"
 	"github.com/pingcap/go-ycsb/pkg/ycsb"
 	"net"
 	"time"
@@ -41,7 +42,7 @@ func (c hbaseCreator) Create(p *properties.Properties) (ycsb.DB, error) {
 		TBinaryStrictRead:  thrift.BoolPtr(true),
 		TBinaryStrictWrite: thrift.BoolPtr(true),
 	})
-	transport := thrift.NewTSocketConf(net.JoinHostPort(HOST, PORT), &thrift.TConfiguration{
+	transport := thrift.NewTSocketConf(net.JoinHostPort(taas.HbaseServerIp, PORT), &thrift.TConfiguration{
 		ConnectTimeout: time.Second * 5,
 		SocketTimeout:  time.Second * 5,
 	})
