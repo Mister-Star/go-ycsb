@@ -32,6 +32,7 @@ func (db *txnDB) TxnCommit(ctx context.Context, table string, keys []string, val
 		ClientTxnId: txnId,
 		TxnType:     taas_proto.TxnType_ClientTxn,
 		TxnState:    0,
+		StorageType: "kv",
 	}
 
 	var readOpNum, writeOpNum uint64 = 0, 0

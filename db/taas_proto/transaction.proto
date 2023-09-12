@@ -72,5 +72,7 @@ message Transaction{
   TxnState txn_state = 10;
 
   uint64 sharding_id = 11;
+  uint64 storage_total_num = 12; //multi-model transaction
+  string storage_type = 13; //multi-model transaction
 
 }
