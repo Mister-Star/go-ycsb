@@ -99,6 +99,8 @@ func runClientCommandFunc(cmd *cobra.Command, args []string, doTransactions bool
 		float64(workload.TotalUpdateCounter)/float64(workload.TotalReadCounter+workload.TotalUpdateCounter))
 	fmt.Printf("[Op] TikvTotalTime %d, TikvReadTime %d\n",
 		taas.TikvTotalLatency, taas.TikvReadLatency)
+	fmt.Printf("[Txn] TotalFailedLatency %d, TotalSuccessLatency %d, AvgFailedLatency %f, AvgSuccessLatency %f\n",
+		taas.TotalFailedLatency, taas.TotalSuccessLatency, float64(taas.TotalFailedLatency)/float64(taas.FailedTransactionCounter), float64(taas.TotalSuccessLatency)/float64(taas.SuccessTransactionCounter))
 }
 
 func runLoadCommandFunc(cmd *cobra.Command, args []string) {

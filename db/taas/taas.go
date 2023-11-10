@@ -37,7 +37,7 @@ var CSNCounter uint64 = 0
 var SuccessTransactionCounter, FailedTransactionCounter, TotalTransactionCounter uint64 = 0, 0, 0
 var SuccessReadCounter, FailedReadCounter, TotalReadCounter uint64 = 0, 0, 0
 var SuccessUpdateCounter, FailedUpdateounter, TotalUpdateCounter uint64 = 0, 0, 0
-var TotalLatency, TikvReadLatency, TikvTotalLatency uint64 = 0, 0, 0
+var TotalLatency, TikvReadLatency, TikvTotalLatency, TotalSuccessLatency, TotalFailedLatency uint64 = 0, 0, 0, 0, 0
 var latency []uint64
 
 func SetConfig(globalProps *properties.Properties) {
