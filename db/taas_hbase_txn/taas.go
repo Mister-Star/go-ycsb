@@ -130,12 +130,14 @@ func (db *txnDB) TxnCommit(ctx context.Context, table string, keys []string, val
 			atomic.AddUint64(&taas.FailedReadCounter, uint64(readOpNum))
 			atomic.AddUint64(&taas.FailedUpdateounter, uint64(writeOpNum))
 			atomic.AddUint64(&taas.FailedTransactionCounter, 1)
+			atomic.AddUint64(&taas.TotalFailedLatency, t2)
 			//fmt.Println("Commit Failed")
 			return errors.New("txn conflict handle failed")
 		}
 		atomic.AddUint64(&taas.SuccessReadCounter, uint64(readOpNum))
 		atomic.AddUint64(&taas.SuccessUpdateCounter, uint64(writeOpNum))
 		atomic.AddUint64(&taas.SuccessTransactionCounter, 1)
+		atomic.AddUint64(&taas.TotalSuccessLatency, t2)
 		//fmt.Println("Commit Success")
 	} else {
 		fmt.Println("txn_bak.go 481")
