@@ -14,6 +14,9 @@ import (
 	"github.com/pingcap/go-ycsb/db/taas_proto"
 )
 
+var TaaSServerNum = 0
+var TaasServerIps = []string{"", "", "", ""}
+
 var LocalServerIp = "127.0.0.1"
 var TaasServerIp = "127.0.0.1"
 var StorageServerIp = "127.0.0.1"
@@ -25,6 +28,7 @@ var ClientNum = 64
 var UnPackNum = 16
 
 type TaasTxn struct {
+	TaaSID            uint64
 	GzipedTransaction []byte
 }
 
@@ -56,33 +60,42 @@ func SetConfig(globalProps *properties.Properties) {
 }
 
 func SendTxnToTaas() {
-	socket, _ := zmq.NewSocket(zmq.PUSH)
-	err := socket.SetSndbuf(1000000000)
-	if err != nil {
-		return
+	var sockets []*zmq.Socket
+	if TaaSServerNum == 0 {
+		TaaSServerNum = 1
+		TaasServerIps[0] = TaasServerIp
 	}
-	err = socket.SetRcvbuf(1000000000)
-	if err != nil {
-		return
+	for i := 0; i < TaaSServerNum; i++ {
+		socket, _ := zmq.NewSocket(zmq.PUSH)
+		err := socket.SetSndbuf(1000000000)
+		if err != nil {
+			return
+		}
+		err = socket.SetRcvbuf(1000000000)
+		if err != nil {
+			return
+		}
+		err = socket.SetSndhwm(1000000000)
+		if err != nil {
+			return
+		}
+		err = socket.SetRcvhwm(1000000000)
+		if err != nil {
+			return
+		}
+		err = socket.Connect("tcp://" + TaasServerIps[i] + ":5551")
+		if err != nil {
+			fmt.Println("taas.go 97")
+			log.Fatal(err)
+		}
+		fmt.Println("连接Taas Send " + TaasServerIps[i])
+		sockets[i] = socket
 	}
-	err = socket.SetSndhwm(1000000000)
-	if err != nil {
-		return
-	}
-	err = socket.SetRcvhwm(1000000000)
-	if err != nil {
-		return
-	}
-	err = socket.Connect("tcp://" + TaasServerIp + ":5551")
-	if err != nil {
-		fmt.Println("taas.go 97")
-		log.Fatal(err)
-	}
-	fmt.Println("连接Taas Send " + TaasServerIp)
+
 	for {
 		value, ok := <-TaasTxnCH
 		if ok {
-			_, err := socket.Send(string(value.GzipedTransaction), 0)
+			_, err := sockets[value.TaaSID%uint64(TaaSServerNum)].Send(string(value.GzipedTransaction), 0)
 			//fmt.Println("taas send thread")
 			if err != nil {
 				return

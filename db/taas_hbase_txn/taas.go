@@ -115,7 +115,10 @@ func (db *txnDB) TxnCommit(ctx context.Context, table string, keys []string, val
 	}
 	GzipedTransaction := bufferBeforeGzip.Bytes()
 	//fmt.Println("Send to Taas")
-	taas.TaasTxnCH <- taas.TaasTxn{GzipedTransaction}
+	taas.TaasTxnCH <- taas.TaasTxn{
+		TaaSID:            txnId,
+		GzipedTransaction: GzipedTransaction,
+	}
 
 	result, ok := <-(taas.ChanList[txnId%uint64(taas.ClientNum)])
 	//fmt.Println("Receive From Taas")

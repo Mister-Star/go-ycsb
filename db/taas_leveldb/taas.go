@@ -97,7 +97,10 @@ func (db *txnDB) TxnCommit(ctx context.Context, table string, keys []string, val
 	if err != nil {
 		return err
 	}
-	taas.TaasTxnCH <- taas.TaasTxn{GzipedTransaction: sendString}
+	taas.TaasTxnCH <- taas.TaasTxn{
+		TaaSID:            txnId,
+		GzipedTransaction: sendString,
+	}
 
 	result, ok := <-(taas.ChanList[txnId%uint64(taas.ClientNum)])
 	//fmt.Println("Receive From Taas")
