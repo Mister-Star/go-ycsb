@@ -28,8 +28,6 @@ func (db *txnDB) TxnCommit(ctx context.Context, table string, keys []string, val
 		StartEpoch:  0,
 		CommitEpoch: 5,
 		Csn:         uint64(time.Now().UnixNano()),
-		ServerIp:    taas.TaasServerIp,
-		ServerId:    0,
 		ClientIp:    taas.LocalServerIp,
 		ClientTxnId: txnId,
 		TxnType:     taas_proto.TxnType_ClientTxn,

@@ -202,7 +202,7 @@ func (db *txnDB) Update(ctx context.Context, table string, key string, values ma
 	//	CommitEpoch: 5,
 	//	Csn:         uint64(time.Now().UnixNano()),
 	//	ServerIp:    TaasServerIp,
-	//	ServerId:    0,
+	//
 	//	ClientIp:    clientIP,
 	//	ClientTxnId: txnId,
 	//	TxnType:     taas_proto.TxnType_ClientTxn,

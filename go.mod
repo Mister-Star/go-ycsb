@@ -5,7 +5,6 @@ module github.com/pingcap/go-ycsb
 require (
 	cloud.google.com/go/spanner v1.41.0
 	github.com/HdrHistogram/hdrhistogram-go v1.1.2
-	github.com/XiaoMi/pegasus-go-client v0.0.0-20181029071519-9400942c5d1c
 	github.com/aerospike/aerospike-client-go v1.35.2
 	github.com/apple/foundationdb/bindings/go v0.0.0-20200112054404-407dc0907f4f
 	github.com/boltdb/bolt v1.3.1
@@ -18,7 +17,6 @@ require (
 	github.com/facebookgo/ensure v0.0.0-20200202191622-63f1cf65ac4c // indirect
 	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
 	github.com/facebookgo/subset v0.0.0-20200203212716-c811ad88dec4 // indirect
-	github.com/fortytw2/leaktest v1.3.0 // indirect
 	github.com/go-ini/ini v1.49.0 // indirect
 	github.com/go-redis/redis/v9 v9.0.0-rc.1
 	github.com/go-sql-driver/mysql v1.6.0
@@ -49,11 +47,24 @@ require (
 	github.com/golang/protobuf v1.5.3
 	github.com/icexin/brpc-go v0.0.0-20220326172744-e17e992d3bb3
 	github.com/pebbe/zmq4 v1.2.10
+	github.com/spf13/viper v1.8.1
 	go.etcd.io/etcd/client/pkg/v3 v3.5.2
 	go.etcd.io/etcd/client/v3 v3.5.2
 	google.golang.org/grpc v1.53.0
 	google.golang.org/protobuf v1.31.0
 
+)
+
+require (
+	github.com/fsnotify/fsnotify v1.4.9 // indirect
+	github.com/hashicorp/hcl v1.0.0 // indirect
+	github.com/mitchellh/mapstructure v1.4.1 // indirect
+	github.com/pelletier/go-toml v1.9.3 // indirect
+	github.com/spf13/afero v1.9.2 // indirect
+	github.com/spf13/cast v1.3.1 // indirect
+	github.com/spf13/jwalterweatherman v1.1.0 // indirect
+	github.com/subosito/gotenv v1.2.0 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
 
 require (
@@ -120,7 +131,7 @@ require (
 	github.com/smartystreets/goconvey v1.8.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/stathat/consistent v1.0.0 // indirect
-	github.com/syndtr/goleveldb v1.0.0 // indirect
+	github.com/syndtr/goleveldb v1.0.0
 	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/tikv/pd/client v0.0.0-20220307081149-841fa61e9710 // indirect
 	github.com/twmb/murmur3 v1.1.3 // indirect
@@ -131,7 +142,6 @@ require (
 	github.com/yuin/gopher-lua v0.0.0-20181031023651-12c4817b42c5 // indirect
 	go.etcd.io/etcd/api/v3 v3.5.2 // indirect
 	go.opencensus.io v0.24.0 // indirect
-	go.starlark.net v0.0.0-20230718153141-1c3ac63bd217
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
 	go.uber.org/zap v1.20.0 // indirect
@@ -146,7 +156,6 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
-	gopkg.in/tomb.v2 v2.0.0-20161208151619-d5d1b5820637 // indirect
 )
 
 replace github.com/apache/thrift => github.com/apache/thrift v0.16.0
@@ -154,6 +163,8 @@ replace github.com/apache/thrift => github.com/apache/thrift v0.16.0
 //require github.com/Mister-Star/go-ycsb/taas_tikv v0.1.0
 
 replace (
+	github.com/pingcap/go-ycsb/db/hbase => ./hbase
+	github.com/pingcap/go-ycsb/db/leveldb_txn => ./leveldb_txn
 	github.com/pingcap/go-ycsb/db/taas_hbase => ./taas_hbase
 	github.com/pingcap/go-ycsb/db/taas_hbase_txn => ./taas_hbase_txn
 	github.com/pingcap/go-ycsb/db/taas_proto => ./taas_proto
@@ -161,8 +172,6 @@ replace (
 	github.com/pingcap/go-ycsb/db/taas_tikv_txn => ./taas_tikv_txn
 	github.com/pingcap/go-ycsb/db/tikv => ./tikv
 	github.com/pingcap/go-ycsb/db/tikv_txn => ./tikv_txn
-	github.com/pingcap/go-ycsb/db/leveldb_txn => ./leveldb_txn
-	github.com/pingcap/go-ycsb/db/hbase => ./hbase
 )
 
 go 1.18

@@ -1,0 +1,14 @@
+TaaS:
+  ServerNum: 2
+  ServerIPs:
+    - 202.199.6.201
+    - 202.199.6.126
+
+Client:
+  OpNum: 10
+  #ClientNum: 64
+  UnPackNum: 16
+  LocalServerIP: 202.199.6.201
+  StorageServerIp: 202.199.6.201
+  HbaseServerIp: 202.199.6.201
+  LevelDBServerIP: 202.199.6.201

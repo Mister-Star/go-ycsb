@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/magiconair/properties"
 	zmq "github.com/pebbe/zmq4"
+	"github.com/spf13/viper"
 	"log"
 )
 
@@ -14,8 +15,8 @@ import (
 	"github.com/pingcap/go-ycsb/db/taas_proto"
 )
 
-var TaaSServerNum = 0
-var TaasServerIps = []string{"", "", "", ""}
+var TaaSServerNum = 1
+var TaasServerIps []string
 
 var LocalServerIp = "127.0.0.1"
 var TaasServerIp = "127.0.0.1"
@@ -55,16 +56,45 @@ func SetConfig(globalProps *properties.Properties) {
 	ClientNum = globalProps.GetInt("threadcount", 64)
 	UnPackNum = globalProps.GetInt("unpackNum", 16)
 
-	fmt.Println("localServerIp : " + LocalServerIp + ", taasServerIp : " + TaasServerIp + ", hbaseServerIp " + HbaseServerIp + ", levelDBServerIp " + LevelDBServerIP)
+	TaaSConfig := viper.New()
+	//TaaSConfig.SetConfigFile("workloads/TaaS_config.yml")
+	TaaSConfig.AddConfigPath(".")
+	TaaSConfig.AddConfigPath("workloads/")
+	TaaSConfig.SetConfigName("TaaS_config")
+	TaaSConfig.SetConfigType("yaml")
+
+	if err := TaaSConfig.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			fmt.Println(err, "找不到配置文件..")
+		} else {
+			fmt.Println(err, "配置文件出错..")
+		}
+	}
+
+	TaaSServerNum = TaaSConfig.GetInt("taas.servernum")
+	TaasServerIps = TaaSConfig.GetStringSlice("taas.serverips")
+	fmt.Println(TaasServerIps)
+	//for k, v := range TaasServerIps {
+	//	TaasServerIps[k] = v
+	//}
+	LocalServerIp = TaaSConfig.GetString("client.localserverip")
+	StorageServerIp = TaaSConfig.GetString("client.storageserverip")
+	HbaseServerIp = TaaSConfig.GetString("client.hbaseserverip")
+	LevelDBServerIP = TaaSConfig.GetString("client.leveldbserverip")
+
+	OpNum = TaaSConfig.GetInt("Client.OpNum")
+	//ClientNum = TaaSConfig.GetInt("Client.ClientNum")
+	UnPackNum = TaaSConfig.GetInt("Client.UnPackNum")
+
+	allSettings := TaaSConfig.AllSettings()
+	fmt.Println(allSettings)
+
+	fmt.Println("localServerIp : " + LocalServerIp + ", hbaseServerIp " + HbaseServerIp + ", levelDBServerIp " + LevelDBServerIP)
 
 }
 
 func SendTxnToTaas() {
 	var sockets []*zmq.Socket
-	if TaaSServerNum == 0 {
-		TaaSServerNum = 1
-		TaasServerIps[0] = TaasServerIp
-	}
 	for i := 0; i < TaaSServerNum; i++ {
 		socket, _ := zmq.NewSocket(zmq.PUSH)
 		err := socket.SetSndbuf(1000000000)
@@ -88,8 +118,8 @@ func SendTxnToTaas() {
 			fmt.Println("taas.go 97")
 			log.Fatal(err)
 		}
-		fmt.Println("连接Taas Send " + TaasServerIps[i])
-		sockets[i] = socket
+		fmt.Println("Taas Send " + TaasServerIps[i])
+		sockets = append(sockets, socket)
 	}
 
 	for {
