@@ -718,7 +718,9 @@ func (coreCreator) Create(p *properties.Properties) (ycsb.Workload, error) {
 		opCount := p.GetInt64(prop.OperationCount, 0)
 		expectedNewKeys := int64(float64(opCount) * insertProportion * 2.0)
 		keyrangeUpperBound = insertStart + insertCount + expectedNewKeys
-		c.keyChooser = generator.NewScrambledZipfian(keyrangeLowerBound, keyrangeUpperBound, generator.ZipfianConstant)
+		//c.keyChooser = generator.NewScrambledZipfian(keyrangeLowerBound, keyrangeUpperBound, generator.ZipfianConstant)
+		hotopnFraction := p.GetFloat64(prop.HotspotOpnFraction, prop.HotspotOpnFractionDefault)
+		c.keyChooser = generator.NewScrambledZipfian(keyrangeLowerBound, keyrangeUpperBound, hotopnFraction)
 	case "latest":
 		c.keyChooser = generator.NewSkewedLatest(c.transactionInsertKeySequence)
 	case "hotspot":
